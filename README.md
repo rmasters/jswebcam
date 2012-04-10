@@ -8,7 +8,9 @@ To configure for your own domain:
 
 *   Edit **web.js** (serves publically-accessible content) to update the port you want to listen on (default: 8080).
 *   Edit **server.js** (receives and broadcasts images) to update the port you want this server to listen on (default: 8081).
-*   Edit **index.html** to updat ethe `SERVER_URL` to point where **server.js** is running.
+*   Edit **index.html** to update the `SERVER_URL` to point where server.js is running.
+
+To use, run both node.js servers, visit the page hosted by web.js on a mobile browser supporting `getUserMedia` (Opera Mobile) and one or more other browsers (that are not sending images).
 
 Todo/ideas:
 
