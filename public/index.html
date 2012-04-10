@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Hangouts</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <script src="socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <!-- Receiver -->
+        <img src="" id="receiver">
+
+        <!-- Optional sender -->
+        <video autoplay="true" id="client">
+        <canvas id="preview"></canvas>
+
+        <!-- Log output -->
+        <div id="log"></div>
+
+        <script>
+            $(document).ready(function() {
+                var c_width = 100;
+                var c_height = 200;
+
+                var SERVER_URL = 'http://example.org:8081';
+
+                // Setup elements
+                var receiver = document.getElementById('receiver');
+                var canvas = document.getElementById('preview');
+                var ctx = canvas.getContext('2d');
+                var video = document.getElementById('client');
+
+                // Set the display region dimensions
+                receiver.style.height = c_height;
+                receiver.style.width = c_width;
+                canvas.width = c_width;
+                canvas.height = c_height;
+
+                // Socket connection
+                var socket = io.connect(SERVER_URL);
+
+                log('Ready to go');
+
+                function log(message) {
+                    // Log messages can be emitted to the server for debugging
+                    //socket.emit('info', message);
+                    $('#log').append(message);
+                    console.log(message);
+                }
+
+                /**
+                 * Display incoming data
+                 */
+                socket.on('update', function(data) {
+                    receiver.src = data;
+                    log('Received data');
+                });
+
+                /**
+                 * Broadcast client
+                 */
+                if (navigator.getUserMedia) {
+                    log('Browser capable of streaming media');
+
+                    navigator.getUserMedia('video', function(stream) { video.src = stream; }, function(error) { log('Capture error ' + error); });
+
+                    function draw(v, ctx, w, h) {
+                        ctx.drawImage(v, 0, 0, w, h);
+                        socket.emit('data', canvas.toDataURL("image/png"));
+                        setTimeout(function() { draw(v, ctx, w, h); }, 500);
+                    }
+                    draw(video, ctx, c_width, c_height);
+                } else {
+                    $(canvas).hide();
+                    $(video).hide();
+                }
+            });
+        </script>
+    </body>
+</html>
